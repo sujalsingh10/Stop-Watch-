@@ -1,114 +1,120 @@
-<?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:gravity="center"
-    android:orientation="vertical"
-    android:padding="20dp">
+public class Main {
 
-    <TextView
-        android:id="@+id/timerView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="00:00:00"
-        android:textSize="40sp"
-        android:textStyle="bold"
-        android:layout_marginBottom="20dp"/>
+ public static void main(String[] args) {
+  
+  Stopwatch stopwatch = new Stopwatch();
 
-    <Button
-        android:id="@+id/startButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Start"/>
-
-    <Button
-        android:id="@+id/pauseButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Pause"
-        android:layout_marginTop="10dp"/>
-
-    <Button
-        android:id="@+id/resetButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Reset"
-        android:layout_marginTop="10dp"/>
-</LinearLayout>
-package com.example.stopwatch;
-
-import android.os.Bundle;
-import android.os.Handler;
-import android.view.View;
-import android.widget.Button;
-import android.widget.TextView;
-import androidx.appcompat.app.AppCompatActivity;
-
-public class MainActivity extends AppCompatActivity {
-
-    private TextView timerView;
-    private Button startButton, pauseButton, resetButton;
-    
-    private Handler handler = new Handler();
-    private long startTime = 0L, timeInMillis = 0L;
-    private boolean isRunning = false;
-
-    private Runnable runnable = new Runnable() {
-        @Override
-        public void run() {
-            if (isRunning) {
-                timeInMillis = System.currentTimeMillis() - startTime;
-                int seconds = (int) (timeInMillis / 1000);
-                int minutes = seconds / 60;
-                int hours = minutes / 60;
-                seconds = seconds % 60;
-                minutes = minutes % 60;
-
-                timerView.setText(String.format("%02d:%02d:%02d", hours, minutes, seconds));
-                handler.postDelayed(this, 1000);  // Update every second
-            }
-        }
-    };
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
-
-        timerView = findViewById(R.id.timerView);
-        startButton = findViewById(R.id.startButton);
-        pauseButton = findViewById(R.id.pauseButton);
-        resetButton = findViewById(R.id.resetButton);
-
-        startButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (!isRunning) {
-                    startTime = System.currentTimeMillis() - timeInMillis;
-                    isRunning = true;
-                    handler.post(runnable);
-                }
-            }
-        });
-
-        pauseButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isRunning = false;
-                handler.removeCallbacks(runnable);
-            }
-        });
-
-        resetButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                isRunning = false;
-                handler.removeCallbacks(runnable);
-                timeInMillis = 0L;
-                timerView.setText("00:00:00");
-            }
-        });
-    }
+ }
 }
-# Stop-Watch-
-allows to record time and can be used for various useful purposes
+// ***************************************************
+import java.awt.*;
+import java.awt.event.*;
+import javax.swing.*;
+
+public class Stopwatch implements ActionListener{
+ 
+ JFrame frame = new JFrame();
+ JButton startButton = new JButton("START");
+ JButton resetButton = new JButton("RESET");
+ JLabel timeLabel = new JLabel();
+ int elapsedTime = 0;
+ int seconds =0;
+ int minutes =0;
+ int hours =0;
+ boolean started = false;
+ String seconds_string = String.format("%02d", seconds);
+ String minutes_string = String.format("%02d", minutes);
+ String hours_string = String.format("%02d", hours);
+ 
+ Timer timer = new Timer(1000, new ActionListener() {
+  
+  public void actionPerformed(ActionEvent e) {
+   
+   elapsedTime=elapsedTime+1000;
+   hours = (elapsedTime/3600000);
+   minutes = (elapsedTime/60000) % 60;
+   seconds = (elapsedTime/1000) % 60;
+   seconds_string = String.format("%02d", seconds);
+   minutes_string = String.format("%02d", minutes);
+   hours_string = String.format("%02d", hours);
+   timeLabel.setText(hours_string+":"+minutes_string+":"+seconds_string);
+   
+  }
+  
+ });
+ 
+ 
+ Stopwatch(){
+  
+  timeLabel.setText(hours_string+":"+minutes_string+":"+seconds_string);
+  timeLabel.setBounds(100,100,200,100);
+  timeLabel.setFont(new Font("Verdana",Font.PLAIN,35));
+  timeLabel.setBorder(BorderFactory.createBevelBorder(1));
+  timeLabel.setOpaque(true);
+  timeLabel.setHorizontalAlignment(JTextField.CENTER);
+  
+  startButton.setBounds(100,200,100,50);
+  startButton.setFont(new Font("Ink Free",Font.PLAIN,20));
+  startButton.setFocusable(false);
+  startButton.addActionListener(this);
+  
+  resetButton.setBounds(200,200,100,50);
+  resetButton.setFont(new Font("Ink Free",Font.PLAIN,20));
+  resetButton.setFocusable(false);
+  resetButton.addActionListener(this);
+  
+  frame.add(startButton);
+  frame.add(resetButton);
+  frame.add(timeLabel);
+  
+  frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+  frame.setSize(420,420);
+  frame.setLayout(null);
+  frame.setVisible(true);
+ }
+ 
+ @Override
+ public void actionPerformed(ActionEvent e) {
+  
+  if(e.getSource()==startButton) {
+   
+   if(started==false) {
+    started=true;
+    startButton.setText("STOP");
+    start();
+   }
+   else {
+    started=false;
+    startButton.setText("START");
+    stop();
+   }
+   
+  }
+  if(e.getSource()==resetButton) {
+   started=false;
+   startButton.setText("START");
+   reset();
+  }
+  
+ }
+ 
+ void start() {
+  timer.start();
+ }
+ 
+ void stop() {
+  timer.stop();
+ }
+ 
+ void reset() {
+  timer.stop();
+  elapsedTime=0;
+  seconds =0;
+  minutes=0;
+  hours=0;
+  seconds_string = String.format("%02d", seconds);
+  minutes_string = String.format("%02d", minutes);
+  hours_string = String.format("%02d", hours);       timeLabel.setText(hours_string+":"+minutes_string+":"+seconds_string);
+ }
+
+}
